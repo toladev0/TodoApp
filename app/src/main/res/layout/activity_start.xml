@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/start_cover"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="73dp"
+        android:paddingHorizontal="32dp"
+        android:gravity="bottom|center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:fontFamily="@font/lexend_deca_semibold"
+            android:text="@string/task_management_amp_nto_do_list"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="24sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:fontFamily="@font/lexend_deca"
+            android:text="@string/this_productive_tool_is_designed_to_help_nyou_better_manage_your_task_nproject_wise_conveniently"
+            android:textAlignment="center"
+            android:textColor="@color/secondery"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="331dp"
+            android:layout_height="52dp"
+            app:cornerRadius="14dp"
+            android:backgroundTint="@color/primary"
+            android:fontFamily="@font/lexend_deca_semibold"
+            android:text="@string/let_s_start"
+            android:textSize="19sp"
+            tools:ignore="VisualLintButtonSize" />
+
+    </LinearLayout>
+
+</RelativeLayout>
