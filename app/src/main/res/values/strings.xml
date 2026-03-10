@@ -3,4 +3,9 @@
     <string name="task_management_amp_nto_do_list"><![CDATA[Task Management &\nTo-Do List]]></string>
     <string name="this_productive_tool_is_designed_to_help_nyou_better_manage_your_task_nproject_wise_conveniently">This productive tool is designed to help\nyou better manage your task \nproject-wise conveniently!</string>
     <string name="let_s_start">Let’s Start</string>
+    <string name="home">Home</string>
+    <string name="calender">Calender</string>
+    <string name="add">Add</string>
+    <string name="documents">Documents</string>
+    <string name="profile">Profile</string>
 </resources>
