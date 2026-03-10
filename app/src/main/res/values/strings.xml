@@ -8,4 +8,9 @@
     <string name="add">Add</string>
     <string name="documents">Documents</string>
     <string name="profile">Profile</string>
+    <string name="hello">Hello!</string>
+    <string name="livia_vaccaro">Livia Vaccaro</string>
+    <string name="today">Your today’s task\nalmost done!</string>
+    <string name="view_task">View Task</string>
+    <string name="progress">85%</string>
 </resources>
