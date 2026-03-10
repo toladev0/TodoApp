@@ -13,4 +13,10 @@
     <string name="today">Your today’s task\nalmost done!</string>
     <string name="view_task">View Task</string>
     <string name="progress">85%</string>
+    <string name="in_progress">In Progress</string>
+    <string name="count_number">6</string>
+    <string name="office_project">Office Project</string>
+    <string name="grocery_shopping_app_ndesign">Grocery shopping app\ndesign</string>
+    <string name="personal_project">Personal Project</string>
+    <string name="uber_eats_redesign_nchallange">Uber Eats redesign\nchallange</string>
 </resources>
