@@ -69,7 +69,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<Task>> call, Throwable t) {
-
+                Toast.makeText(getContext(), "No internet connection!", Toast.LENGTH_SHORT).show();
             }
         });
     }
