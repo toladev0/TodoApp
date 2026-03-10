@@ -1,27 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="10sp"
-    android:layout_marginBottom="10dp">
+    android:layout_height="66dp"
+    android:layout_marginBottom="16dp">
 
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Office Project"/>
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="15dp">
 
-    <TextView
-        android:id="@+id/totalTasksText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="23 Tasks"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/progressText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="70%"/>
+            <ImageView
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:src="@drawable/office_project"
+                tools:ignore="ContentDescription,ImageContrastCheck" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_marginStart="12sp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                tools:ignore="TextSizeCheck">
+
+                <TextView
+                    android:id="@+id/titleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lexend_deca"
+                    android:text="@string/office_project"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/totalTasksText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lexend_deca"
+                    android:text="@string/_23_tasks"
+                    android:textColor="@color/secondery"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:gravity="center">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminateOnly="false"
+                    tools:progress="70"
+                    android:progress="70"
+                    android:layout_gravity="center_horizontal"
+                    android:progressDrawable="@drawable/circle" >
+                </ProgressBar>
+
+                <TextView
+                    android:id="@+id/progressText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/lexend_deca"
+                    android:gravity="center"
+                    android:text="@string/progress"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    tools:ignore="TextSizeCheck,TextSizeCheck,TextSizeCheck,TextSizeCheck,TextSizeCheck,TextSizeCheck" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>
