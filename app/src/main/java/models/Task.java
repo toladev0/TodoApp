@@ -5,6 +5,12 @@ public class Task {
     private int totalTasks;
     private int progress;
 
+    public Task(String title, int totalTasks, int progress) {
+        this.title = title;
+        this.totalTasks = totalTasks;
+        this.progress = progress;
+    }
+
     public String getTitle() {
         return title;
     }

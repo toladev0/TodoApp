@@ -40,8 +40,17 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+
+    implementation(libs.datastore.preferences.rxjava3)
+    implementation("io.reactivex.rxjava3:rxjava:3.1.12")
+    implementation(libs.rxandroid)
+
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.2.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

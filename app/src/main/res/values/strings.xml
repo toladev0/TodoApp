@@ -21,4 +21,8 @@
     <string name="uber_eats_redesign_nchallange">Uber Eats redesign\nchallange</string>
     <string name="task_groups">Task Groups</string>
     <string name="_23_tasks">23 Tasks</string>
+    <string name="add_project">Add Project</string>
+    <string name="project_name">Project Name</string>
+    <string name="input_here">Input here</string>
+    <string name="description">Description</string>
 </resources>
