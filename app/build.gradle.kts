@@ -4,16 +4,12 @@ plugins {
 
 android {
     namespace = "com.example.todoapp"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.todoapp"
         minSdk = 28
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -44,12 +40,10 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
+    implementation(libs.datastore.preferences)
     implementation(libs.datastore.preferences.rxjava3)
-    implementation("io.reactivex.rxjava3:rxjava:3.1.12")
+    implementation(libs.rxjava)
     implementation(libs.rxandroid)
-
-    implementation("androidx.datastore:datastore-preferences:1.2.0")
-    implementation("androidx.datastore:datastore-preferences-rxjava3:1.2.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

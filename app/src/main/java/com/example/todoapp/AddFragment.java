@@ -1,6 +1,8 @@
 package com.example.todoapp;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +21,9 @@ import androidx.datastore.preferences.core.PreferencesKeys;
 import androidx.datastore.rxjava3.RxDataStore;
 import androidx.fragment.app.Fragment;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.Objects;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -30,6 +36,8 @@ public class AddFragment extends Fragment {
     EditText projectNameView;
     EditText descriptionView;
     Button btnSaveView;
+    TextView tvDueDateView;
+    Calendar calendar = Calendar.getInstance();
 
     RxDataStore<Preferences> dataStore;
 
@@ -56,6 +64,52 @@ public class AddFragment extends Fragment {
 
         btnBackView = view.findViewById(R.id.btnBack);
         btnBackView.setOnClickListener(v -> requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit());
+
+        tvDueDateView = view.findViewById(R.id.tvDueDate);
+        updateDateTime();
+        tvDueDateView.setOnClickListener(v -> showDatePicker());
+    }
+
+    private void showDatePicker() {
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                requireContext(),
+                (view, y, m, d) -> {
+                    calendar.set(Calendar.YEAR, y);
+                    calendar.set(Calendar.MONTH, m);
+                    calendar.set(Calendar.DAY_OF_MONTH, d);
+                    showTimePicker();
+                },
+                year, month, day
+        );
+
+        datePickerDialog.show();
+    }
+
+    private void showTimePicker() {
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                requireContext(),
+                (view, h, m) -> {
+                    calendar.set(Calendar.HOUR_OF_DAY, h);
+                    calendar.set(Calendar.MINUTE, m);
+                    updateDateTime();
+                },
+                hour, minute, false // false = AM/PM
+        );
+
+        timePickerDialog.show();
+    }
+
+    private void updateDateTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", Locale.getDefault());
+        tvDueDateView.setText(sdf.format(calendar.getTime()));
+        tvDueDateView.setTextColor(getResources().getColor(android.R.color.black));
     }
 
     private static final Preferences.Key<String> TASK_KEY =
