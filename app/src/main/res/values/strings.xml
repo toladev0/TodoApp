@@ -38,4 +38,6 @@
     <string name="task_name">Task name</string>
     <string name="description_optional">Description (optional)</string>
     <string name="save_task">Save Task</string>
+    <string name="tasks">Tasks</string>
+    <string name="time">12:00 AM</string>
 </resources>

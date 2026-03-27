@@ -1,8 +1,8 @@
-package services;
+package com.example.todoapp.database.services;
 
 import java.util.List;
 
-import models.Task;
+import com.example.todoapp.models.Task;
 import retrofit2.Call;
 import retrofit2.http.GET;
 

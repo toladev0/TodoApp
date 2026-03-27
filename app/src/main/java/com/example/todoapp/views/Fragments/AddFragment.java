@@ -1,10 +1,8 @@
-package com.example.todoapp;
+package com.example.todoapp.views.Fragments;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,16 +20,18 @@ import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import models.TaskDao;
-import models.TaskDb;
-import models.TaskLocal;
 
-public class AddFragment extends Fragment {
+import com.example.todoapp.R;
+import com.example.todoapp.controllers.TaskController;
+import com.example.todoapp.database.TaskDao;
+import com.example.todoapp.database.TaskDb;
+import com.example.todoapp.models.TaskLocal;
+
+public class AddFragment extends Fragment implements TaskController.TaskCallBack {
     ImageView btnBackView;
     EditText nameView;
     EditText descriptionView;
@@ -43,6 +43,7 @@ public class AddFragment extends Fragment {
     TaskDao taskDao;
     CompositeDisposable disposable = new CompositeDisposable();
 
+    TaskController controller;
 
     @Nullable
     @Override
@@ -51,10 +52,12 @@ public class AddFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
 
         taskDao = TaskDb.getINSTANCE(requireContext()).taskDao();
+        controller = new TaskController(requireContext());
+        
         nameView = view.findViewById(R.id.name);
         descriptionView = view.findViewById(R.id.description);
         DueDateView = view.findViewById(R.id.DueDate);
@@ -96,7 +99,9 @@ public class AddFragment extends Fragment {
             RadioButton selectedPriorityBtn = view.findViewById(selectedPriorityId);
             String priority = selectedPriorityBtn.getText().toString();
 
-            saveTask(name, description, dueDate, group, priority);
+            controller.saveTask(name, description, dueDate, group, priority);
+            clearFields();
+            Toast.makeText(requireContext(), "Task added successfully", Toast.LENGTH_SHORT).show();
         });
 
         btnBackView.setOnClickListener(v -> requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit());
@@ -147,35 +152,6 @@ public class AddFragment extends Fragment {
         DueDateView.setTextColor(getResources().getColor(android.R.color.black));
     }
 
-    private void saveTask(String name, String description, String dueDate, String group, String priority) {
-        disposable.add(taskDao.insert(new TaskLocal(0, name, description, dueDate, group, priority, false))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        () -> {
-                            Log.i("Room", "Task saved");
-                            new AlertDialog.Builder(requireContext())
-                                    .setTitle("Success")
-                                    .setMessage("Task has been saved successfully!")
-                                    .setPositiveButton("Go to List", (dialog, which) -> {
-                                        requireActivity().getSupportFragmentManager().beginTransaction()
-                                                .replace(R.id.fragment_container, new DocumentsFragment())
-                                                .commit();
-                                    })
-                                    .setNegativeButton("Add Another", (dialog, which) -> {
-                                        clearFields();
-                                    })
-                                    .setCancelable(false)
-                                    .show();
-                        },
-                        error -> {
-                            Log.e("Room", "Error saving task", error);
-                            Toast.makeText(requireContext(), "Error saving task", Toast.LENGTH_SHORT).show();
-                        }
-                )
-        );
-    }
-
     private void clearFields() {
         nameView.setText("");
         descriptionView.setText("");
@@ -192,5 +168,18 @@ public class AddFragment extends Fragment {
         if (disposable != null) {
             disposable.clear(); // Cancels pending operations when Fragment is destroyed
         }
+        if (controller != null) {
+            controller.dispose();
+        }
+    }
+
+    @Override
+    public void onTaskLoaded(List<TaskLocal> tasks) {
+
+    }
+
+    @Override
+    public void onError(String message) {
+
     }
 }

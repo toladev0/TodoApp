@@ -1,4 +1,4 @@
-package models;
+package com.example.todoapp.models;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -7,12 +7,12 @@ import androidx.room.PrimaryKey;
 public class TaskLocal {
     @PrimaryKey(autoGenerate = true)
     private int id;
-    private String name;
-    private String description;
-    private String dueDate;
-    private String group;
-    private String priority;
-    private boolean isCompleted;
+    private final String name;
+    private final String description;
+    private final String dueDate;
+    private final String group;
+    private final String priority;
+    private final boolean isCompleted;
 
     public int getId() {
         return id;

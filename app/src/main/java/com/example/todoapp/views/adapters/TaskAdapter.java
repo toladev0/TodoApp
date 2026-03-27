@@ -1,4 +1,4 @@
-package adapters;
+package com.example.todoapp.views.adapters;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
@@ -12,14 +12,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todoapp.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import models.Task;
+import com.example.todoapp.models.Task;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ItemViewHolder>{
 
-    List<Task> tasks = new ArrayList<>();
+    List<Task> tasks;
 
     public TaskAdapter(List<Task> tasks) {
         this.tasks = tasks;
@@ -44,10 +43,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ItemViewHolder
     }
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
-        private TextView title;
-        private TextView totalTasks;
-        private TextView progress;
-        private ProgressBar progressBar;
+        private final TextView title;
+        private final TextView totalTasks;
+        private final TextView progress;
+        private final ProgressBar progressBar;
 
         public ItemViewHolder(View itemView) {
             super(itemView);

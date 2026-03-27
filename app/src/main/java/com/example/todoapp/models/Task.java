@@ -1,9 +1,9 @@
-package models;
+package com.example.todoapp.models;
 
 public class Task {
-    private String title;
-    private int totalTasks;
-    private int progress;
+    private final String title;
+    private final int totalTasks;
+    private final int progress;
 
     public Task(String title, int totalTasks, int progress) {
         this.title = title;

@@ -5,11 +5,11 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".views.MainActivity">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
-        android:name="com.example.todoapp.HomeFragment"
+        android:name="com.example.todoapp.views.Fragments.HomeFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_home" />

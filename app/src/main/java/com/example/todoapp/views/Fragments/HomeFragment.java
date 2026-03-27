@@ -1,4 +1,4 @@
-package com.example.todoapp;
+package com.example.todoapp.views.Fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -19,24 +19,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import adapters.TaskAdapter;
+import com.example.todoapp.R;
+import com.example.todoapp.views.adapters.TaskAdapter;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import models.Task;
+import com.example.todoapp.models.Task;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import services.TaskService;
+import com.example.todoapp.database.services.TaskService;
+import com.example.todoapp.views.DataStoreManager;
 
 public class HomeFragment extends Fragment {
 
     RecyclerView recyclerView;
 
     private TaskAdapter taskAdapter;
-    private List<Task> tasks = new ArrayList<>();
+    private final List<Task> tasks = new ArrayList<>();
 
     RxDataStore<Preferences> dataStore;
 
@@ -68,10 +71,11 @@ public class HomeFragment extends Fragment {
         TaskService taskService = retrofit.create(TaskService.class);
         Call<List<Task>> call = taskService.getTasks();
 
-        call.enqueue(new Callback<List<Task>>(){
+        call.enqueue(new Callback<>() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
-                if(response.isSuccessful() && response.body() != null) {
+            public void onResponse(@NonNull Call<List<Task>> call, @NonNull Response<List<Task>> response) {
+                if (response.isSuccessful() && response.body() != null) {
                     tasks.addAll(response.body());
                     taskAdapter.notifyDataSetChanged();
                 } else {
@@ -81,7 +85,7 @@ public class HomeFragment extends Fragment {
 
             @SuppressLint("CheckResult")
             @Override
-            public void onFailure(Call<List<Task>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Task>> call, @NonNull Throwable t) {
                 Toast.makeText(getContext(), "No internet connection!", Toast.LENGTH_SHORT).show();
                 loadTaskOffline();
             }
@@ -91,7 +95,7 @@ public class HomeFragment extends Fragment {
     private static final Preferences.Key<String> TASK_KEY =
             PreferencesKeys.stringKey("task_title");
 
-    @SuppressLint("CheckResult")
+    @SuppressLint({"CheckResult", "NotifyDataSetChanged"})
     private void loadTaskOffline(){
         dataStore.data().map(prefs -> {
                     String task = prefs.get(TASK_KEY);
@@ -103,9 +107,7 @@ public class HomeFragment extends Fragment {
                             tasks.add(new Task(task, 1, 100));
                             taskAdapter.notifyDataSetChanged();
                         },
-                        error -> {
-                            Log.e("MY ERROR", error.getMessage());
-                        }
+                        error -> Log.e("MY ERROR", Objects.requireNonNull(error.getMessage()))
                 );
     }
 }

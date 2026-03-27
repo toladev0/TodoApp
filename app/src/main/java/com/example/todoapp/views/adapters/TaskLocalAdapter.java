@@ -1,4 +1,4 @@
-package adapters;
+package com.example.todoapp.views.adapters;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
@@ -12,14 +12,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todoapp.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import models.TaskLocal;
+import com.example.todoapp.models.TaskLocal;
 
 public class TaskLocalAdapter extends RecyclerView.Adapter<TaskLocalAdapter.ItemViewHolder> {
 
-    List<TaskLocal> tasks = new ArrayList<>();
+    List<TaskLocal> tasks;
 
     public TaskLocalAdapter(List<TaskLocal> tasks) {
         this.tasks = tasks;

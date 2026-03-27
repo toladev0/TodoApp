@@ -1,4 +1,4 @@
-package com.example.todoapp;
+package com.example.todoapp.views;
 
 import android.content.Context;
 import androidx.datastore.preferences.core.Preferences;

@@ -1,5 +1,6 @@
-package com.example.todoapp;
+package com.example.todoapp.views.Fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,28 +13,23 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.todoapp.R;
+import com.example.todoapp.controllers.TaskController;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import adapters.TaskLocalAdapter;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import models.TaskDao;
-import models.TaskDb;
-import models.TaskLocal;
+import com.example.todoapp.views.adapters.TaskLocalAdapter;
+import com.example.todoapp.database.TaskDb;
+import com.example.todoapp.models.TaskLocal;
 
-public class DocumentsFragment extends Fragment {
+public class DocumentsFragment extends Fragment implements TaskController.TaskCallBack{
     TaskDb taskDb;
-    TaskDao taskDao;
-    CompositeDisposable disposable = new CompositeDisposable();
     RecyclerView recyclerView;
     List<TaskLocal> tasks = new ArrayList<>();
     private TaskLocalAdapter taskLocalAdapter;
-
-
+    TaskController controller;
 
     @Nullable
     @Override
@@ -53,36 +49,34 @@ public class DocumentsFragment extends Fragment {
         tabLayout.addTab(tabLayout.newTab().setText("Completed"));
 
         taskDb = TaskDb.getINSTANCE(requireContext());
-        taskDao = taskDb.taskDao();
 
         taskLocalAdapter = new TaskLocalAdapter(this.tasks);
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setAdapter(taskLocalAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        loadTasks();
+        controller = new TaskController(requireContext());
+        controller.loadTasks(this);
     }
 
-    private void loadTasks() {
-        disposable.add(taskDao.getAllTasks()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        newTasks -> {
-                            if (newTasks != null) {
-                                tasks.clear();      // Clear old data
-                                tasks.addAll(newTasks); // Add new data from DB
-                                taskLocalAdapter.notifyDataSetChanged();
-                            }
-                        },
-                        throwable -> Log.e("Room", "Error loading tasks", throwable)
-                )
-        );
-    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        disposable.clear(); // Important: prevent memory leaks
+
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    @Override
+    public void onTaskLoaded(List<TaskLocal> newTasks) {
+        tasks.clear();      // Clear old data
+        tasks.addAll(newTasks); // Add new data from DB
+        taskLocalAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onError(String message) {
+        // Handle error
+        Log.e("Error: ", message);
     }
 }
