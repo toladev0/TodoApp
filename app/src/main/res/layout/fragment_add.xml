@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/lexend_deca_semibold"
-            android:text="@string/add_project"
+            android:text="@string/create_task"
             android:textSize="19sp"
             android:textColor="@color/black"
             android:textAlignment="center"/>
@@ -56,13 +56,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/lexend_deca"
-                android:text="@string/project_name"
+                android:text="@string/task_name"
                 android:textSize="9sp"
-                android:textColor="@color/secondery"
+                android:textColor="@color/black"
                 tools:ignore="SmallSp" />
 
             <EditText
-                android:id="@+id/projectName"
+                android:id="@+id/name"
                 style="@style/Widget.Material3.TextInputEditText.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -71,7 +71,7 @@
                 android:inputType="text"
                 android:textColor="@color/black"
                 android:textSize="14sp"
-                tools:ignore="Autofill,DuplicateSpeakableTextCheck,VisualLintTextFieldSize" />
+                tools:ignore="Autofill,DuplicateSpeakableTextCheck,VisualLintTextFieldSize,TextContrastCheck" />
 
         </LinearLayout>
         
@@ -93,9 +93,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/lexend_deca"
-                android:text="@string/description"
+                android:text="@string/description_optional"
                 android:textSize="9sp"
-                android:textColor="@color/secondery"
+                android:textColor="@color/black"
                 tools:ignore="SmallSp" />
 
             <EditText
@@ -103,14 +103,14 @@
                 style="@style/Widget.Material3.TextInputEditText.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
-                android:fontFamily="@font/lexend_deca"
-                android:hint="@string/input_here"
-                android:textSize="11sp"
-                android:textColor="@color/black"
                 android:ems="10"
+                android:fontFamily="@font/lexend_deca"
                 android:gravity="start|top"
+                android:hint="@string/input_here"
                 android:inputType="textMultiLine"
-                tools:ignore="Autofill,VisualLintTextFieldSize" />
+                android:textColor="@color/black"
+                android:textSize="11sp"
+                tools:ignore="Autofill,VisualLintTextFieldSize,TextContrastCheck" />
 
         </LinearLayout>
 
@@ -122,46 +122,146 @@
         android:layout_marginTop="28dp"
         android:layout_marginBottom="8dp"
         android:fontFamily="@font/lexend_deca"
-        android:text="Due Date"
+        android:text="@string/due_date"
         android:textSize="14sp"
         android:textColor="@color/black"
         tools:ignore="SmallSp" />
 
     <TextView
-        android:id="@+id/tvDueDate"
+        android:id="@+id/DueDate"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="Select Due Datex"
+        android:text="@string/select_due_date"
         android:background="@drawable/bg_input"
         android:fontFamily="@font/lexend_deca"
         android:hint="@string/input_here"
         android:inputType="text"
         android:textColor="@color/black"
         android:textSize="14sp"
-        android:drawableStart="@drawable/calendar"
-        android:drawablePadding="10dp"/>
+        android:drawablePadding="10dp"
+        app:drawableStartCompat="@drawable/calendar"
+        tools:ignore="RtlSymmetry,TextViewEdits" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/lexend_deca"
+        android:text="@string/task_group"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        tools:ignore="SmallSp" />
 
-    <LinearLayout
+    <RadioGroup
+        android:id="@+id/TaskGroup"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="bottom">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <RadioButton
+            android:id="@+id/rbOfficeProject"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/lexend_deca"
+            android:text="@string/office_project"
+            android:textColor="@color/black"
+            tools:ignore="VisualLintButtonSize" />
 
-        <Button
-            android:id="@+id/btnAddProject"
-            android:layout_width="331dp"
-            android:layout_height="52dp"
-            android:layout_margin="16dp"
-            android:layout_gravity="center"
-            android:backgroundTint="@color/primary"
-            android:fontFamily="@font/lexend_deca_semibold"
-            android:text="@string/add_project"
-            android:textSize="19sp"
-            app:cornerRadius="14dp"
-            tools:ignore="VisualLintButtonSize,DuplicateSpeakableTextCheck" />
-    </LinearLayout>
+        <RadioButton
+            android:id="@+id/rbPersonalProject"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/lexend_deca"
+            android:text="@string/personal_project"
+
+            tools:ignore="VisualLintButtonSize" />
+
+        <RadioButton
+            android:id="@+id/rbDailyProject"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/lexend_deca"
+            android:text="@string/daily_project"
+            android:textColor="@color/black"
+            tools:ignore="VisualLintButtonSize" />
+
+        <RadioButton
+            android:id="@+id/rbHealth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/lexend_deca"
+            android:text="@string/health"
+            android:textColor="@color/black"
+            tools:ignore="VisualLintButtonSize" />
+
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/lexend_deca"
+        android:text="@string/priority"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        tools:ignore="SmallSp" />
+
+    <RadioGroup
+        android:id="@+id/Priority"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <RadioButton
+            android:id="@+id/rbLow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/lexend_deca"
+            android:text="@string/low"
+            android:textColor="@color/black"
+            tools:ignore="VisualLintButtonSize" />
+
+        <RadioButton
+            android:id="@+id/rbMedium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/lexend_deca"
+            android:text="@string/medium"
+            android:textColor="@color/black"
+            tools:ignore="VisualLintButtonSize" />
+
+        <RadioButton
+            android:id="@+id/rbHigh"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/high"
+            android:fontFamily="@font/lexend_deca"
+            android:textColor="@color/black"
+            tools:ignore="VisualLintButtonSize" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btnAddProject"
+        android:layout_width="331dp"
+        android:layout_height="52dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="center"
+        android:backgroundTint="@color/primary"
+        android:fontFamily="@font/lexend_deca_semibold"
+        android:text="@string/save_task"
+        android:textSize="19sp"
+        app:cornerRadius="14dp"
+        tools:ignore="VisualLintButtonSize,DuplicateSpeakableTextCheck" />
 </LinearLayout>

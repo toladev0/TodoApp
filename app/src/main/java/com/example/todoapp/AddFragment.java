@@ -1,6 +1,6 @@
 package com.example.todoapp;
 
-import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
@@ -11,35 +11,38 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.datastore.preferences.core.MutablePreferences;
-import androidx.datastore.preferences.core.Preferences;
-import androidx.datastore.preferences.core.PreferencesKeys;
-import androidx.datastore.rxjava3.RxDataStore;
 import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Objects;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import models.TaskDao;
+import models.TaskDb;
+import models.TaskLocal;
 
 public class AddFragment extends Fragment {
-
     ImageView btnBackView;
-    EditText projectNameView;
+    EditText nameView;
     EditText descriptionView;
+    TextView DueDateView;
+    RadioGroup TaskGroupView;
+    RadioGroup PriorityView;
     Button btnSaveView;
-    TextView tvDueDateView;
     Calendar calendar = Calendar.getInstance();
+    TaskDao taskDao;
+    CompositeDisposable disposable = new CompositeDisposable();
 
-    RxDataStore<Preferences> dataStore;
 
     @Nullable
     @Override
@@ -51,23 +54,55 @@ public class AddFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        dataStore = DataStoreManager.getInstance(requireContext());
-
-        projectNameView = view.findViewById(R.id.projectName);
+        taskDao = TaskDb.getINSTANCE(requireContext()).taskDao();
+        nameView = view.findViewById(R.id.name);
         descriptionView = view.findViewById(R.id.description);
-
+        DueDateView = view.findViewById(R.id.DueDate);
+        TaskGroupView = view.findViewById(R.id.TaskGroup);
+        PriorityView = view.findViewById(R.id.Priority);
         btnSaveView = view.findViewById(R.id.btnAddProject);
+        btnBackView = view.findViewById(R.id.btnBack);
+
         btnSaveView.setOnClickListener(v -> {
-            String projectName = projectNameView.getText().toString();
-            saveTask(projectName);
+            String name = nameView.getText().toString().trim();
+            String description = descriptionView.getText().toString().trim();
+            String dueDate = DueDateView.getText().toString();
+
+            if (name.isEmpty()) {
+                nameView.setError("Name is required");
+                nameView.requestFocus();
+                return;
+            }
+
+            if (description.isEmpty()) {
+                descriptionView.setError("Description is required");
+                descriptionView.requestFocus();
+                return;
+            }
+
+            int selectedGroupId = TaskGroupView.getCheckedRadioButtonId();
+            if (selectedGroupId == -1) {
+                Toast.makeText(requireContext(), "Please select a task group", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            RadioButton selectedGroupBtn = view.findViewById(selectedGroupId);
+            String group = selectedGroupBtn.getText().toString();
+
+            int selectedPriorityId = PriorityView.getCheckedRadioButtonId();
+            if (selectedPriorityId == -1) {
+                Toast.makeText(requireContext(), "Please select a priority", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            RadioButton selectedPriorityBtn = view.findViewById(selectedPriorityId);
+            String priority = selectedPriorityBtn.getText().toString();
+
+            saveTask(name, description, dueDate, group, priority);
         });
 
-        btnBackView = view.findViewById(R.id.btnBack);
         btnBackView.setOnClickListener(v -> requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit());
 
-        tvDueDateView = view.findViewById(R.id.tvDueDate);
         updateDateTime();
-        tvDueDateView.setOnClickListener(v -> showDatePicker());
+        DueDateView.setOnClickListener(v -> showDatePicker());
     }
 
     private void showDatePicker() {
@@ -108,25 +143,54 @@ public class AddFragment extends Fragment {
 
     private void updateDateTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", Locale.getDefault());
-        tvDueDateView.setText(sdf.format(calendar.getTime()));
-        tvDueDateView.setTextColor(getResources().getColor(android.R.color.black));
+        DueDateView.setText(sdf.format(calendar.getTime()));
+        DueDateView.setTextColor(getResources().getColor(android.R.color.black));
     }
 
-    private static final Preferences.Key<String> TASK_KEY =
-            PreferencesKeys.stringKey("task_title");
-
-    @SuppressLint("CheckResult")
-    private void saveTask(String title) {
-        dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            mutablePreferences.set(TASK_KEY, title);
-            return Single.just(mutablePreferences);
-        }).subscribeOn(Schedulers.io())
+    private void saveTask(String name, String description, String dueDate, String group, String priority) {
+        disposable.add(taskDao.insert(new TaskLocal(0, name, description, dueDate, group, priority, false))
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        preferences -> Log.i("MY PREFS", preferences.toString()),
-                        error -> Log.e("MY ERROR", Objects.requireNonNull(error.getMessage()))
-                );
+                        () -> {
+                            Log.i("Room", "Task saved");
+                            new AlertDialog.Builder(requireContext())
+                                    .setTitle("Success")
+                                    .setMessage("Task has been saved successfully!")
+                                    .setPositiveButton("Go to List", (dialog, which) -> {
+                                        requireActivity().getSupportFragmentManager().beginTransaction()
+                                                .replace(R.id.fragment_container, new DocumentsFragment())
+                                                .commit();
+                                    })
+                                    .setNegativeButton("Add Another", (dialog, which) -> {
+                                        clearFields();
+                                    })
+                                    .setCancelable(false)
+                                    .show();
+                        },
+                        error -> {
+                            Log.e("Room", "Error saving task", error);
+                            Toast.makeText(requireContext(), "Error saving task", Toast.LENGTH_SHORT).show();
+                        }
+                )
+        );
+    }
+
+    private void clearFields() {
+        nameView.setText("");
+        descriptionView.setText("");
+        TaskGroupView.clearCheck();
+        PriorityView.clearCheck();
+        calendar = Calendar.getInstance();
+        updateDateTime();
+        nameView.requestFocus();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (disposable != null) {
+            disposable.clear(); // Cancels pending operations when Fragment is destroyed
+        }
     }
 }

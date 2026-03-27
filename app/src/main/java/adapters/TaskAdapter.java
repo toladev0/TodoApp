@@ -49,8 +49,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ItemViewHolder
         private TextView progress;
         private ProgressBar progressBar;
 
-
-
         public ItemViewHolder(View itemView) {
             super(itemView);
 

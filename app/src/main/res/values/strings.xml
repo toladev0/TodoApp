@@ -25,4 +25,17 @@
     <string name="project_name">Project Name</string>
     <string name="input_here">Input here</string>
     <string name="description">Description</string>
+    <string name="due_date">Due Date</string>
+    <string name="task_group">Task Group</string>
+    <string name="priority">Priority</string>
+    <string name="daily_project">Daily Project</string>
+    <string name="health">Health</string>
+    <string name="high">High</string>
+    <string name="low">Low</string>
+    <string name="medium">Medium</string>
+    <string name="select_due_date">Select Due Date</string>
+    <string name="create_task">Create Task</string>
+    <string name="task_name">Task name</string>
+    <string name="description_optional">Description (optional)</string>
+    <string name="save_task">Save Task</string>
 </resources>
