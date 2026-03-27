@@ -1,28 +1,25 @@
-package com.example.todoapp.controllers;
+package com.example.todoapp.presenters;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.example.todoapp.database.TaskDao;
 import com.example.todoapp.database.TaskDb;
 import com.example.todoapp.models.TaskLocal;
+import com.example.todoapp.views.TaskView;
 
-import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class TaskController {
+public class TaskPresenter {
     private final TaskDao taskDao;
+
+    private final TaskView taskView;
     CompositeDisposable disposable = new CompositeDisposable();
 
-    public interface TaskCallBack {
-        void onTaskLoaded(List<TaskLocal> tasks);
-        void onError(String message);
-    }
-
-    public TaskController(Context context){
+    public TaskPresenter(Context context, TaskView taskView) {
+        this.taskView = taskView;
         taskDao = TaskDb.getINSTANCE(context).taskDao();
     }
 
@@ -31,23 +28,23 @@ public class TaskController {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        () -> Log.i("Room", "Task saved"),
-                        error -> Log.e("Room", "Error saving task", error)
+                        taskView::onTaskSave,
+                        error -> taskView.showError("Error saving task")
                 )
         );
     }
 
-    public void loadTasks(TaskCallBack callBack) {
+    public void loadTasks() {
         disposable.add(taskDao.getAllTasks()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         newTasks -> {
                             if (newTasks != null) {
-                                callBack.onTaskLoaded(newTasks);
+                                taskView.loadTask(newTasks);
                             }
                             else {
-                                callBack.onError("Error loading tasks");
+                                taskView.showError("Error loading tasks");
                             }
                         }
                 )

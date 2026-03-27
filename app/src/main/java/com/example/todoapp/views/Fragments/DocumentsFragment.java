@@ -14,7 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todoapp.R;
-import com.example.todoapp.controllers.TaskController;
+import com.example.todoapp.presenters.TaskPresenter;
+import com.example.todoapp.views.TaskView;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -24,12 +25,12 @@ import com.example.todoapp.views.adapters.TaskLocalAdapter;
 import com.example.todoapp.database.TaskDb;
 import com.example.todoapp.models.TaskLocal;
 
-public class DocumentsFragment extends Fragment implements TaskController.TaskCallBack{
+public class DocumentsFragment extends Fragment implements TaskView {
     TaskDb taskDb;
     RecyclerView recyclerView;
     List<TaskLocal> tasks = new ArrayList<>();
     private TaskLocalAdapter taskLocalAdapter;
-    TaskController controller;
+    TaskPresenter presenter;
 
     @Nullable
     @Override
@@ -55,8 +56,8 @@ public class DocumentsFragment extends Fragment implements TaskController.TaskCa
         recyclerView.setAdapter(taskLocalAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        controller = new TaskController(requireContext());
-        controller.loadTasks(this);
+        presenter = new TaskPresenter(requireContext(),this);
+        presenter.loadTasks();
     }
 
 
@@ -68,15 +69,20 @@ public class DocumentsFragment extends Fragment implements TaskController.TaskCa
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
-    public void onTaskLoaded(List<TaskLocal> newTasks) {
+    public void loadTask(List<TaskLocal> newTasks) {
         tasks.clear();      // Clear old data
         tasks.addAll(newTasks); // Add new data from DB
         taskLocalAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onError(String message) {
+    public void showError(String message) {
         // Handle error
         Log.e("Error: ", message);
+    }
+
+    @Override
+    public void onTaskSave() {
+
     }
 }

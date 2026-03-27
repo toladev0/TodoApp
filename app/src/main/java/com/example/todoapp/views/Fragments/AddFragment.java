@@ -26,12 +26,13 @@ import java.util.Locale;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 import com.example.todoapp.R;
-import com.example.todoapp.controllers.TaskController;
+import com.example.todoapp.models.TaskLocal;
+import com.example.todoapp.presenters.TaskPresenter;
 import com.example.todoapp.database.TaskDao;
 import com.example.todoapp.database.TaskDb;
-import com.example.todoapp.models.TaskLocal;
+import com.example.todoapp.views.TaskView;
 
-public class AddFragment extends Fragment implements TaskController.TaskCallBack {
+public class AddFragment extends Fragment implements TaskView  {
     ImageView btnBackView;
     EditText nameView;
     EditText descriptionView;
@@ -43,7 +44,7 @@ public class AddFragment extends Fragment implements TaskController.TaskCallBack
     TaskDao taskDao;
     CompositeDisposable disposable = new CompositeDisposable();
 
-    TaskController controller;
+    TaskPresenter presenter;
 
     @Nullable
     @Override
@@ -56,7 +57,7 @@ public class AddFragment extends Fragment implements TaskController.TaskCallBack
         super.onViewCreated(view, savedInstanceState);
 
         taskDao = TaskDb.getINSTANCE(requireContext()).taskDao();
-        controller = new TaskController(requireContext());
+        presenter = new TaskPresenter(requireContext(), this);
         
         nameView = view.findViewById(R.id.name);
         descriptionView = view.findViewById(R.id.description);
@@ -99,7 +100,7 @@ public class AddFragment extends Fragment implements TaskController.TaskCallBack
             RadioButton selectedPriorityBtn = view.findViewById(selectedPriorityId);
             String priority = selectedPriorityBtn.getText().toString();
 
-            controller.saveTask(name, description, dueDate, group, priority);
+            presenter.saveTask(name, description, dueDate, group, priority);
             clearFields();
             Toast.makeText(requireContext(), "Task added successfully", Toast.LENGTH_SHORT).show();
         });
@@ -168,18 +169,23 @@ public class AddFragment extends Fragment implements TaskController.TaskCallBack
         if (disposable != null) {
             disposable.clear(); // Cancels pending operations when Fragment is destroyed
         }
-        if (controller != null) {
-            controller.dispose();
+        if (presenter != null) {
+            presenter.dispose();
         }
     }
 
     @Override
-    public void onTaskLoaded(List<TaskLocal> tasks) {
+    public void loadTask(List<TaskLocal> tasks) {
 
     }
 
     @Override
-    public void onError(String message) {
+    public void showError(String message) {
+
+    }
+
+    @Override
+    public void onTaskSave() {
 
     }
 }
