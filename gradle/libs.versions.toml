@@ -13,6 +13,8 @@ converterGson = "3.0.0"
 rxandroid = "3.0.2"
 rxjava = "3.1.12"
 room = "2.6.1"
+lifecycleViewmodel = "2.10.0"
+lifecycleLivedata = "2.10.0"
 
 [libraries]
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferencesRxjava3" }
@@ -31,6 +33,8 @@ rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-rxjava3 = { group = "androidx.room", name = "room-rxjava3", version.ref = "room" }
+lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycleViewmodel" }
+lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata", version.ref = "lifecycleLivedata" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -6,85 +6,58 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-
 import com.example.todoapp.R;
-import com.example.todoapp.models.TaskLocal;
-import com.example.todoapp.presenters.TaskPresenter;
-import com.example.todoapp.database.TaskDao;
-import com.example.todoapp.database.TaskDb;
-import com.example.todoapp.views.TaskView;
+import com.example.todoapp.databinding.FragmentAddBinding;
+import com.example.todoapp.viewmodels.TaskViewModel;
 
-public class AddFragment extends Fragment implements TaskView  {
-    ImageView btnBackView;
-    EditText nameView;
-    EditText descriptionView;
-    TextView DueDateView;
-    RadioGroup TaskGroupView;
-    RadioGroup PriorityView;
-    Button btnSaveView;
-    Calendar calendar = Calendar.getInstance();
-    TaskDao taskDao;
-    CompositeDisposable disposable = new CompositeDisposable();
-
-    TaskPresenter presenter;
+public class AddFragment extends Fragment {
+    private FragmentAddBinding binding;
+    private Calendar calendar = Calendar.getInstance();
+    private TaskViewModel viewModel;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_add, container, false);
+        binding = FragmentAddBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        taskDao = TaskDb.getINSTANCE(requireContext()).taskDao();
-        presenter = new TaskPresenter(requireContext(), this);
-        
-        nameView = view.findViewById(R.id.name);
-        descriptionView = view.findViewById(R.id.description);
-        DueDateView = view.findViewById(R.id.DueDate);
-        TaskGroupView = view.findViewById(R.id.TaskGroup);
-        PriorityView = view.findViewById(R.id.Priority);
-        btnSaveView = view.findViewById(R.id.btnAddProject);
-        btnBackView = view.findViewById(R.id.btnBack);
+        viewModel = new ViewModelProvider(this).get(TaskViewModel.class);
 
-        btnSaveView.setOnClickListener(v -> {
-            String name = nameView.getText().toString().trim();
-            String description = descriptionView.getText().toString().trim();
-            String dueDate = DueDateView.getText().toString();
+        binding.btnAddProject.setOnClickListener(v -> {
+            String name = binding.name.getText().toString().trim();
+            String description = binding.description.getText().toString().trim();
+            String dueDate = binding.DueDate.getText().toString();
 
             if (name.isEmpty()) {
-                nameView.setError("Name is required");
-                nameView.requestFocus();
+                binding.name.setError("Name is required");
+                binding.name.requestFocus();
                 return;
             }
 
             if (description.isEmpty()) {
-                descriptionView.setError("Description is required");
-                descriptionView.requestFocus();
+                binding.description.setError("Description is required");
+                binding.description.requestFocus();
                 return;
             }
 
-            int selectedGroupId = TaskGroupView.getCheckedRadioButtonId();
+            int selectedGroupId = binding.TaskGroup.getCheckedRadioButtonId();
             if (selectedGroupId == -1) {
                 Toast.makeText(requireContext(), "Please select a task group", Toast.LENGTH_SHORT).show();
                 return;
@@ -92,7 +65,7 @@ public class AddFragment extends Fragment implements TaskView  {
             RadioButton selectedGroupBtn = view.findViewById(selectedGroupId);
             String group = selectedGroupBtn.getText().toString();
 
-            int selectedPriorityId = PriorityView.getCheckedRadioButtonId();
+            int selectedPriorityId = binding.Priority.getCheckedRadioButtonId();
             if (selectedPriorityId == -1) {
                 Toast.makeText(requireContext(), "Please select a priority", Toast.LENGTH_SHORT).show();
                 return;
@@ -100,15 +73,23 @@ public class AddFragment extends Fragment implements TaskView  {
             RadioButton selectedPriorityBtn = view.findViewById(selectedPriorityId);
             String priority = selectedPriorityBtn.getText().toString();
 
-            presenter.saveTask(name, description, dueDate, group, priority);
+            viewModel.insert(name, description, dueDate, group, priority);
             clearFields();
             Toast.makeText(requireContext(), "Task added successfully", Toast.LENGTH_SHORT).show();
+            
+            // Navigate back to Home after saving
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new DocumentsFragment())
+                    .commit();
         });
 
-        btnBackView.setOnClickListener(v -> requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit());
+        binding.btnBack.setOnClickListener(v -> requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, new DocumentsFragment())
+                .commit());
 
         updateDateTime();
-        DueDateView.setOnClickListener(v -> showDatePicker());
+        binding.DueDate.setOnClickListener(v -> showDatePicker());
     }
 
     private void showDatePicker() {
@@ -149,43 +130,23 @@ public class AddFragment extends Fragment implements TaskView  {
 
     private void updateDateTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", Locale.getDefault());
-        DueDateView.setText(sdf.format(calendar.getTime()));
-        DueDateView.setTextColor(getResources().getColor(android.R.color.black));
+        binding.DueDate.setText(sdf.format(calendar.getTime()));
+        binding.DueDate.setTextColor(getResources().getColor(android.R.color.black));
     }
 
     private void clearFields() {
-        nameView.setText("");
-        descriptionView.setText("");
-        TaskGroupView.clearCheck();
-        PriorityView.clearCheck();
+        binding.name.setText("");
+        binding.description.setText("");
+        binding.TaskGroup.clearCheck();
+        binding.Priority.clearCheck();
         calendar = Calendar.getInstance();
         updateDateTime();
-        nameView.requestFocus();
+        binding.name.requestFocus();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (disposable != null) {
-            disposable.clear(); // Cancels pending operations when Fragment is destroyed
-        }
-        if (presenter != null) {
-            presenter.dispose();
-        }
-    }
-
-    @Override
-    public void loadTask(List<TaskLocal> tasks) {
-
-    }
-
-    @Override
-    public void showError(String message) {
-
-    }
-
-    @Override
-    public void onTaskSave() {
-
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

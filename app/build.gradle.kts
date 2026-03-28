@@ -16,6 +16,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    dataBinding {
+        enable = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -47,6 +51,8 @@ dependencies {
 
     implementation(libs.room.runtime)
     implementation(libs.room.rxjava3)
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.livedata)
     annotationProcessor(libs.room.compiler)
 
     testImplementation(libs.junit)

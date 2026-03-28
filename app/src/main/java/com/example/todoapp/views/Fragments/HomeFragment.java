@@ -2,7 +2,6 @@ package com.example.todoapp.views.Fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,38 +9,34 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.datastore.preferences.core.Preferences;
-import androidx.datastore.preferences.core.PreferencesKeys;
-import androidx.datastore.rxjava3.RxDataStore;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 import com.example.todoapp.R;
 import com.example.todoapp.views.adapters.TaskAdapter;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import com.example.todoapp.models.Task;
+import com.example.todoapp.models.TaskLocal;
+import com.example.todoapp.viewmodels.TaskViewModel;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import com.example.todoapp.database.services.TaskService;
-import com.example.todoapp.views.DataStoreManager;
 
 public class HomeFragment extends Fragment {
 
-    RecyclerView recyclerView;
-
+    private RecyclerView recyclerView;
     private TaskAdapter taskAdapter;
     private final List<Task> tasks = new ArrayList<>();
-
-    RxDataStore<Preferences> dataStore;
+    private TaskViewModel taskViewModel;
 
     @Nullable
     @Override
@@ -53,7 +48,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        dataStore = DataStoreManager.getInstance(requireContext());
+        taskViewModel = new ViewModelProvider(this).get(TaskViewModel.class);
 
         taskAdapter = new TaskAdapter(this.tasks);
         recyclerView = view.findViewById(R.id.recyclerView);
@@ -62,7 +57,7 @@ public class HomeFragment extends Fragment {
         loadTasks();
     }
 
-    private void loadTasks(){
+    private void loadTasks() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://raw.githubusercontent.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -76,14 +71,15 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<List<Task>> call, @NonNull Response<List<Task>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    tasks.clear();
                     tasks.addAll(response.body());
                     taskAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
+                    loadTaskOffline();
                 }
             }
 
-            @SuppressLint("CheckResult")
             @Override
             public void onFailure(@NonNull Call<List<Task>> call, @NonNull Throwable t) {
                 Toast.makeText(getContext(), "No internet connection!", Toast.LENGTH_SHORT).show();
@@ -92,22 +88,38 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private static final Preferences.Key<String> TASK_KEY =
-            PreferencesKeys.stringKey("task_title");
+    @SuppressLint("NotifyDataSetChanged")
+    private void loadTaskOffline() {
+        taskViewModel.tasks.observe(getViewLifecycleOwner(), taskLocals -> {
+            if (taskLocals != null) {
+                tasks.clear();
+                
+                // Grouping TaskLocal data by 'group' to create Task objects for HomeFragment
+                Map<String, List<TaskLocal>> groupedTasks = new HashMap<>();
+                for (TaskLocal local : taskLocals) {
+                    String groupName = local.getGroup();
+                    if (!groupedTasks.containsKey(groupName)) {
+                        groupedTasks.put(groupName, new ArrayList<>());
+                    }
+                    groupedTasks.get(groupName).add(local);
+                }
 
-    @SuppressLint({"CheckResult", "NotifyDataSetChanged"})
-    private void loadTaskOffline(){
-        dataStore.data().map(prefs -> {
-                    String task = prefs.get(TASK_KEY);
-                    return task != null ? task : "";
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        task -> {
-                            tasks.add(new Task(task, 1, 100));
-                            taskAdapter.notifyDataSetChanged();
-                        },
-                        error -> Log.e("MY ERROR", Objects.requireNonNull(error.getMessage()))
-                );
+                for (Map.Entry<String, List<TaskLocal>> entry : groupedTasks.entrySet()) {
+                    String groupName = entry.getKey();
+                    List<TaskLocal> groupTasks = entry.getValue();
+                    
+                    int total = groupTasks.size();
+                    int completed = 0;
+                    for (TaskLocal t : groupTasks) {
+                        if (t.isCompleted()) completed++;
+                    }
+                    
+                    int progress = (total > 0) ? (completed * 100 / total) : 0;
+                    tasks.add(new Task(groupName, total, progress));
+                }
+
+                taskAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }

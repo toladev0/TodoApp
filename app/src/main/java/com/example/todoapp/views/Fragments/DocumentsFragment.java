@@ -2,7 +2,6 @@ package com.example.todoapp.views.Fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,79 +9,57 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.todoapp.R;
-import com.example.todoapp.presenters.TaskPresenter;
-import com.example.todoapp.views.TaskView;
-import com.google.android.material.tabs.TabLayout;
+import com.example.todoapp.databinding.FragmentDocumentsBinding;
+import com.example.todoapp.viewmodels.TaskViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.example.todoapp.views.adapters.TaskLocalAdapter;
-import com.example.todoapp.database.TaskDb;
 import com.example.todoapp.models.TaskLocal;
 
-public class DocumentsFragment extends Fragment implements TaskView {
-    TaskDb taskDb;
-    RecyclerView recyclerView;
-    List<TaskLocal> tasks = new ArrayList<>();
+public class DocumentsFragment extends Fragment {
+    private FragmentDocumentsBinding binding;
+    private final List<TaskLocal> tasks = new ArrayList<>();
     private TaskLocalAdapter taskLocalAdapter;
-    TaskPresenter presenter;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_documents, container, false);
+        binding = FragmentDocumentsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TabLayout tabLayout = view.findViewById(R.id.tabLayout);
-
         // Tabs
-        tabLayout.addTab(tabLayout.newTab().setText("Today's Tasks"));
-        tabLayout.addTab(tabLayout.newTab().setText("Upcoming"));
-        tabLayout.addTab(tabLayout.newTab().setText("Completed"));
-
-        taskDb = TaskDb.getINSTANCE(requireContext());
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Today's Tasks"));
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Upcoming"));
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Completed"));
 
         taskLocalAdapter = new TaskLocalAdapter(this.tasks);
-        recyclerView = view.findViewById(R.id.recyclerView);
-        recyclerView.setAdapter(taskLocalAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.recyclerView.setAdapter(taskLocalAdapter);
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        presenter = new TaskPresenter(requireContext(),this);
-        presenter.loadTasks();
+        TaskViewModel viewModel = new ViewModelProvider(this).get(TaskViewModel.class);
+        viewModel.tasks.observe(getViewLifecycleOwner(), this::loadTask);
     }
 
-
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    @Override
     public void loadTask(List<TaskLocal> newTasks) {
         tasks.clear();      // Clear old data
         tasks.addAll(newTasks); // Add new data from DB
         taskLocalAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void showError(String message) {
-        // Handle error
-        Log.e("Error: ", message);
-    }
-
-    @Override
-    public void onTaskSave() {
-
     }
 }
